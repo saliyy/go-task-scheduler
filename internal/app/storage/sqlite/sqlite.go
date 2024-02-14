@@ -23,7 +23,8 @@ func New(storagePath string) (*Storage, error) {
 	stmt, err := db.Prepare(`
 		CREATE TABLE IF NOT EXISTS tasks(
 			id INTEGER PRIMARY KEY,
-			name TEXT NOT NULL
+			name TEXT NOT NULL,
+			createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 		)
 	`)
 
