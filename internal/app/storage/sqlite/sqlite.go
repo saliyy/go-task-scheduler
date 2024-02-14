@@ -22,9 +22,10 @@ func New(storagePath string) (*Storage, error) {
 	// todo move to migration
 	stmt, err := db.Prepare(`
 		CREATE TABLE IF NOT EXISTS tasks(
-			id INTEGER PRIMARY KEY,
-			name TEXT NOT NULL,
-			createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+			Id INTEGER PRIMARY KEY,
+			Name TEXT NOT NULL,
+			CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+			IsCompleted INTEGER NOT NULl DEFAULT 0
 		)
 	`)
 
