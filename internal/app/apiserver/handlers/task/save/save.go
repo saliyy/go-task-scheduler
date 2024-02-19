@@ -1,11 +1,12 @@
 package save
 
 import (
-	"log/slog"
 	"net/http"
 	dto "task-scheduler/internal/app/dto/task"
 	"task-scheduler/internal/app/entities"
 	respPackage "task-scheduler/internal/lib/api/response"
+
+	"golang.org/x/exp/slog"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -13,8 +14,7 @@ import (
 )
 
 type Request struct {
-	Name        string `json:"name" validate:"required,name"`
-	IsCompleted string `json:"is_completed,omitempty"`
+	Name string `json:"name"`
 }
 
 type Response struct {
@@ -22,13 +22,14 @@ type Response struct {
 	Id int64 `json:"id"`
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=TaskSaver
 type TaskSaver interface {
 	SaveTask(taskDTO *dto.CreateTaskDTO) (entity *entities.TaskEntity, err error)
 }
 
 func New(log *slog.Logger, taskSaver TaskSaver) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.url.save.New"
+		const op = "handlers.task.save.New"
 
 		log = log.With(
 			slog.String("op", op),
@@ -42,7 +43,7 @@ func New(log *slog.Logger, taskSaver TaskSaver) http.HandlerFunc {
 		if err != nil {
 			log.Error("failed to decode request")
 
-			render.JSON(w, r, respPackage.Error("failed to decode request body"))
+			render.JSON(w, r, "faild")
 
 			return
 		}
@@ -50,11 +51,9 @@ func New(log *slog.Logger, taskSaver TaskSaver) http.HandlerFunc {
 		log.Info("request body decoded", slog.Any("request", req))
 
 		if err := validator.New().Struct(req); err != nil {
-			validateErr := err.(validator.ValidationErrors)
-
 			log.Error("invalid request")
 
-			render.JSON(w, r, validateErr)
+			render.JSON(w, r, "faild")
 
 			return
 		}

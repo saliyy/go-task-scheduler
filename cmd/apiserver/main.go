@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"log"
-	"log/slog"
+	"net/http"
 	"os"
 	"task-scheduler/internal/app/apiserver"
 	"task-scheduler/internal/app/apiserver/handlers/task/save"
@@ -12,6 +12,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"golang.org/x/exp/slog"
 )
 
 var (
@@ -31,18 +32,13 @@ func main() {
 
 	if err != nil {
 		log.Fatal("No such config file")
-	}
-
-	s := apiserver.New(config)
-	storage, err := sqlite.New(config.StoragePath)
-
-	if err != nil {
-		log.Fatal("error to initializate db")
 		os.Exit(1)
 	}
 
+	storage, err := sqlite.New(config.StoragePath)
+
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("error to init db")
 		os.Exit(1)
 	}
 
@@ -54,7 +50,9 @@ func main() {
 
 	router.Post("/task", save.New(slog.Default(), storage))
 
-	if err := s.Start(); err != nil {
-		log.Fatal()
+	if err := http.ListenAndServe(config.BindAddr, router); err != nil {
+		log.Fatal(err.Error())
 	}
+
+	log.Fatal("Server is unvailable")
 }

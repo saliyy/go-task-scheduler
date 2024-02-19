@@ -5,6 +5,7 @@ import (
 	"fmt"
 	dto "task-scheduler/internal/app/dto/task"
 	"task-scheduler/internal/app/entities"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -50,23 +51,24 @@ func (s *Storage) SaveTask(taskDTO *dto.CreateTaskDTO) (entity *entities.TaskEnt
 
 	stmt, err := s.db.Prepare("INSERT INTO tasks(Name) VALUES (?)")
 	if err != nil {
-		return nil, fmt.Errorf("error to prepare create statement")
+		return nil, fmt.Errorf("%s: %w", op, err)
+
 	}
 
 	res, err := stmt.Exec(taskDTO.Name)
 	if err != nil {
-		return nil, fmt.Errorf("error save task")
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		return nil, fmt.Errorf("error to get last insert id")
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &entities.TaskEntity{
 		Id:          id,
 		Name:        taskDTO.Name,
 		IsCompleted: false,
-		CreatedAt:   "now",
+		CreatedAt:   time.DateTime,
 	}, nil
 }
