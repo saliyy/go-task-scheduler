@@ -9,7 +9,6 @@ import (
 	"task-scheduler/internal/app/apiserver/handlers/task/save"
 	"task-scheduler/internal/app/storage/sqlite"
 
-	"github.com/BurntSushi/toml"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"golang.org/x/exp/slog"
@@ -24,16 +23,10 @@ func init() {
 }
 
 func main() {
+
 	flag.Parse()
 
-	config := apiserver.NewConifg()
-
-	_, err := toml.DecodeFile(configPath, config)
-
-	if err != nil {
-		log.Fatal("No such config file")
-		os.Exit(1)
-	}
+	config := apiserver.MustLoad(configPath)
 
 	storage, err := sqlite.New(config.StoragePath)
 

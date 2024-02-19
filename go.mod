@@ -13,7 +13,12 @@ require (
 	github.com/stretchr/testify v1.8.4
 )
 
-require github.com/stretchr/objx v0.5.0 // indirect
+require (
+	github.com/ilyakaznacheev/cleanenv v1.5.0 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
+	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
+)
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
