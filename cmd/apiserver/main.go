@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"task-scheduler/internal/app/apiserver"
+	"task-scheduler/internal/app/apiserver/handlers/task/list"
 	"task-scheduler/internal/app/apiserver/handlers/task/save"
 	"task-scheduler/internal/app/storage/sqlite"
 
@@ -42,6 +43,7 @@ func main() {
 	router.Use(middleware.Recoverer)
 
 	router.Post("/task", save.New(slog.Default(), storage))
+	router.Get("/tasks", list.New(slog.Default(), storage))
 
 	if err := http.ListenAndServe(config.BindAddr, router); err != nil {
 		log.Fatal(err.Error())

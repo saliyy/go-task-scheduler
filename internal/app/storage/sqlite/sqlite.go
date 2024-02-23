@@ -72,3 +72,31 @@ func (s *Storage) SaveTask(taskDTO *dto.CreateTaskDTO) (entity *entities.TaskEnt
 		CreatedAt:   time.DateTime,
 	}, nil
 }
+
+func (s *Storage) GetTasks() (entites []entities.TaskEntity, err error) {
+	const op = "storage.sqlite.GetTasks"
+
+	rows, err := s.db.Query("SELECT * FROM tasks")
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	defer rows.Close()
+
+	var tasks []entities.TaskEntity
+
+	for rows.Next() {
+		var task entities.TaskEntity
+		if err := rows.Scan(&task.Id, &task.Name, &task.CreatedAt, &task.IsCompleted); err != nil {
+			return tasks, err
+		}
+		tasks = append(tasks, task)
+	}
+
+	if err = rows.Err(); err != nil {
+		return tasks, err
+	}
+
+	return tasks, nil
+
+}
