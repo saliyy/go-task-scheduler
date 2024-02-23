@@ -1,3 +1,4 @@
 bind_addr = ":8083"
 log_level = "debug"
 storage_path = "./storage/storage.db"
+dump_path = "./storage/dump/sqlite/dump.sql"

@@ -11,6 +11,7 @@ type Config struct {
 	BindAddr    string `toml:"bind_addr"`
 	LogLevel    string `toml:"log_level"`
 	StoragePath string `toml:"storage_path"`
+	DumpPath    string `toml:"dump_path"`
 }
 
 func NewConifg() *Config {
@@ -18,6 +19,7 @@ func NewConifg() *Config {
 		BindAddr:    ":8080",
 		LogLevel:    "debug",
 		StoragePath: "tasks.sqlite3",
+		DumpPath:    "dump.sql",
 	}
 }
 
