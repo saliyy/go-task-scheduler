@@ -51,6 +51,7 @@ func main() {
 
 	userRepo := userrepo.New(storage)
 	router.Post("/oauth/signup", oauth.New(slog.Default(), userRepo))
+	router.Post("/oauth/authorize", oauth.Authorize(slog.Default(), userRepo))
 
 	if err := http.ListenAndServe(config.BindAddr, router); err != nil {
 		log.Fatal(err.Error())
@@ -58,8 +59,3 @@ func main() {
 
 	log.Fatal("Server is unvailable")
 }
-
-/*
-* 1) endpoints (create token, get token) [getToken[], createUser[x]]
-* 2) middlewares (get token)
- */

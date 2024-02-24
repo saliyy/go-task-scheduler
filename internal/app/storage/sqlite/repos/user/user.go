@@ -1,6 +1,8 @@
 package userrepo
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	user_dto "task-scheduler/internal/app/dto/user"
 	"task-scheduler/internal/app/entities"
@@ -50,4 +52,28 @@ func (repo *UserRepository) CreateUser(userDto *user_dto.UserCreateDTO) (*entiti
 		Password: userDto.Password,
 		Email:    userDto.Email,
 	}, nil
+}
+
+func (repo *UserRepository) GetByEmail(email string) (*entities.User, error) {
+	const op = "storage.sqlite.userrepo.GetUserByEmail"
+
+	stmt, err := repo.storage.DB.Prepare("SELECT * FROM users WHERE Email = ?")
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	defer stmt.Close()
+
+	var userEntity entities.User
+
+	err = stmt.QueryRow(email).Scan(&userEntity.Id, &userEntity.Name, &userEntity.Password, &userEntity.Email)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, storage.NoUserByEmail
+		}
+
+		return nil, fmt.Errorf("%s: execute statement: %w", op, err)
+	}
+
+	return &userEntity, nil
 }
