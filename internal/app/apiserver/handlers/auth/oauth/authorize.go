@@ -105,6 +105,8 @@ func Authorize(log *slog.Logger, userByEmailGiver UserByEmailGiver) http.Handler
 
 		token, _ := claims.SignedString([]byte(SecretKey))
 
+		log.Info("user received token", slog.Any("userId", user.Id))
+
 		render.JSON(w, r, TokenResponse{
 			Token: token,
 		})
