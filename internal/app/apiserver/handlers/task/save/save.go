@@ -4,7 +4,6 @@ import (
 	"net/http"
 	dto "task-scheduler/internal/app/dto/task"
 	"task-scheduler/internal/app/entities"
-	respPackage "task-scheduler/internal/lib/api/response"
 
 	"golang.org/x/exp/slog"
 
@@ -18,8 +17,8 @@ type Request struct {
 }
 
 type Response struct {
-	respPackage.Response
-	Id int64 `json:"id"`
+	status int
+	Id     int64 `json:"id"`
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=TaskSaver
@@ -73,9 +72,11 @@ func New(log *slog.Logger, taskSaver TaskSaver) http.HandlerFunc {
 			return
 		}
 
+		w.WriteHeader(http.StatusCreated)
+
 		render.JSON(w, r, Response{
-			Response: respPackage.OK(),
-			Id:       taskEntity.Id,
+			status: http.StatusCreated,
+			Id:     taskEntity.Id,
 		})
 	}
 }
