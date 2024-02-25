@@ -21,14 +21,14 @@ func New(sqliteStorage *sqlite.Storage) *TaskRepository {
 func (r *TaskRepository) SaveTask(taskDTO *dto.CreateTaskDTO) (entity *entities.TaskEntity, err error) {
 	const op = "storage.sqlite.saveTask"
 
-	stmt, err := r.storage.DB.Prepare("INSERT INTO tasks(Name) VALUES (?)")
+	stmt, err := r.storage.DB.Prepare("INSERT INTO tasks(Name, UserId) VALUES (?, ?)")
 
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 
 	}
 
-	res, err := stmt.Exec(taskDTO.Name)
+	res, err := stmt.Exec(taskDTO.Name, taskDTO.UserId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -43,13 +43,14 @@ func (r *TaskRepository) SaveTask(taskDTO *dto.CreateTaskDTO) (entity *entities.
 		Name:        taskDTO.Name,
 		IsCompleted: false,
 		CreatedAt:   time.DateTime,
+		UserId:      taskDTO.UserId,
 	}, nil
 }
 
-func (r *TaskRepository) GetTasks() (entites []entities.TaskEntity, err error) {
+func (r *TaskRepository) GetTasksByUserId(userId int) (entites []entities.TaskEntity, err error) {
 	const op = "storage.sqlite.GetTasks"
 
-	rows, err := r.storage.DB.Query("SELECT * FROM tasks")
+	rows, err := r.storage.DB.Query("SELECT * FROM tasks WHERE UserId = ?", userId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -60,7 +61,7 @@ func (r *TaskRepository) GetTasks() (entites []entities.TaskEntity, err error) {
 
 	for rows.Next() {
 		var task entities.TaskEntity
-		if err := rows.Scan(&task.Id, &task.Name, &task.CreatedAt, &task.IsCompleted); err != nil {
+		if err := rows.Scan(&task.Id, &task.Name, &task.CreatedAt, &task.IsCompleted, &task.UserId); err != nil {
 			return tasks, err
 		}
 		tasks = append(tasks, task)

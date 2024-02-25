@@ -9,6 +9,7 @@ import (
 	"task-scheduler/internal/app/apiserver/handlers/auth/oauth"
 	"task-scheduler/internal/app/apiserver/handlers/task/list"
 	"task-scheduler/internal/app/apiserver/handlers/task/save"
+	"task-scheduler/internal/app/apiserver/middlewares/auth"
 	"task-scheduler/internal/app/storage/sqlite"
 	taskrepo "task-scheduler/internal/app/storage/sqlite/repos"
 	userrepo "task-scheduler/internal/app/storage/sqlite/repos/user"
@@ -46,8 +47,12 @@ func main() {
 	router.Use(middleware.Recoverer)
 
 	taskRepo := taskrepo.New(storage)
-	router.Post("/task", save.New(slog.Default(), taskRepo))
-	router.Get("/tasks", list.New(slog.Default(), taskRepo))
+
+	router.Route("/tasks", func(r chi.Router) {
+		r.Use(auth.CurrentUserCtx)
+		r.Post("/", save.New(slog.Default(), taskRepo))
+		r.Get("/", list.New(slog.Default(), taskRepo))
+	})
 
 	userRepo := userrepo.New(storage)
 	router.Post("/oauth/signup", oauth.New(slog.Default(), userRepo))

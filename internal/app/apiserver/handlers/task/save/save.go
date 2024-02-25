@@ -1,7 +1,9 @@
 package save
 
 import (
+	"fmt"
 	"net/http"
+	"task-scheduler/internal/app/apiserver/middlewares/auth"
 	dto "task-scheduler/internal/app/dto/task"
 	"task-scheduler/internal/app/entities"
 
@@ -57,11 +59,15 @@ func New(log *slog.Logger, taskSaver TaskSaver) http.HandlerFunc {
 			return
 		}
 
+		currentUserId := r.Context().Value(auth.UserIdContextKey).(int)
+
 		createDto := &dto.CreateTaskDTO{
 			Name:        req.Name,
 			IsCompleted: false,
+			UserId:      currentUserId,
 		}
 
+		fmt.Println(createDto)
 		taskEntity, err := taskSaver.SaveTask(createDto)
 
 		if err != nil {

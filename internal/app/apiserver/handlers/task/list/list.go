@@ -3,6 +3,7 @@ package list
 import (
 	"encoding/json"
 	"net/http"
+	"task-scheduler/internal/app/apiserver/middlewares/auth"
 	"task-scheduler/internal/app/entities"
 
 	"golang.org/x/exp/slog"
@@ -12,7 +13,7 @@ import (
 )
 
 type TaskGiver interface {
-	GetTasks() (entity []entities.TaskEntity, err error)
+	GetTasksByUserId(userId int) (entity []entities.TaskEntity, err error)
 }
 
 func New(log *slog.Logger, taskGiver TaskGiver) http.HandlerFunc {
@@ -24,7 +25,9 @@ func New(log *slog.Logger, taskGiver TaskGiver) http.HandlerFunc {
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		list, err := taskGiver.GetTasks()
+		currentUserId := r.Context().Value(auth.UserIdContextKey).(int)
+
+		list, err := taskGiver.GetTasksByUserId(currentUserId)
 
 		if err != nil {
 
