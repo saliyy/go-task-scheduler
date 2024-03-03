@@ -1,0 +1,37 @@
+version: '3.6'
+
+networks:
+  rabbitmq-bridge:
+    driver: bridge
+
+services:
+  rabbitmq:
+    image: 'rabbitmq:3-management'
+    networks:
+      - rabbitmq-bridge
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmuser
+      - RABBITMQ_DEFAULT_PASS=rmpassword
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648  
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "15672:15672"
+      - "5673:5673"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 15s
+      retries: 5
+  rest:
+    build: .
+    ports:
+      - "8083:8083" 
+    networks:
+      - rabbitmq-bridge
+    volumes:
+      - ./storage:/storage
+    depends_on:
+      - rabbitmq
+    environment: 
+      RMQ_URL: "amqp://rmuser:rmpassword@rabbitmq:5673/"

@@ -54,6 +54,10 @@ func main() {
 		r.Get("/", list.New(slog.Default(), taskRepo))
 	})
 
+	router.Route("/lists", func(r chi.Router) {
+		r.Use(auth.CurrentUserCtx)
+	})
+
 	userRepo := userrepo.New(storage)
 	router.Post("/oauth/signup", oauth.New(slog.Default(), userRepo))
 	router.Post("/oauth/authorize", oauth.Authorize(slog.Default(), userRepo))

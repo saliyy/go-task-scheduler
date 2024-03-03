@@ -34,6 +34,7 @@ func New(storagePath string, dumpPath string) (*Storage, error) {
 	}
 
 	_, err = stmt.Exec()
+
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
