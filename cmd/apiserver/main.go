@@ -7,11 +7,13 @@ import (
 	"os"
 	"task-scheduler/internal/app/apiserver"
 	"task-scheduler/internal/app/apiserver/handlers/auth/oauth"
-	"task-scheduler/internal/app/apiserver/handlers/task/list"
+	"task-scheduler/internal/app/apiserver/handlers/list"
+	task "task-scheduler/internal/app/apiserver/handlers/task/list"
 	"task-scheduler/internal/app/apiserver/handlers/task/save"
 	"task-scheduler/internal/app/apiserver/middlewares/auth"
 	"task-scheduler/internal/app/storage/sqlite"
-	taskrepo "task-scheduler/internal/app/storage/sqlite/repos"
+	listrepo "task-scheduler/internal/app/storage/sqlite/repos/list"
+	taskrepo "task-scheduler/internal/app/storage/sqlite/repos/task"
 	userrepo "task-scheduler/internal/app/storage/sqlite/repos/user"
 
 	"github.com/go-chi/chi/v5"
@@ -47,15 +49,18 @@ func main() {
 	router.Use(middleware.Recoverer)
 
 	taskRepo := taskrepo.New(storage)
+	listRepo := listrepo.New(storage)
 
 	router.Route("/tasks", func(r chi.Router) {
 		r.Use(auth.CurrentUserCtx)
 		r.Post("/", save.New(slog.Default(), taskRepo))
-		r.Get("/", list.New(slog.Default(), taskRepo))
+		r.Get("/", task.New(slog.Default(), taskRepo))
 	})
 
 	router.Route("/lists", func(r chi.Router) {
 		r.Use(auth.CurrentUserCtx)
+		r.Post("/", list.New(slog.Default(), listRepo))
+		// add user to list (sending email you are added to list)
 	})
 
 	userRepo := userrepo.New(storage)

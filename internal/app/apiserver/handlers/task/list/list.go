@@ -1,4 +1,4 @@
-package list
+package task
 
 import (
 	"encoding/json"
@@ -14,6 +14,15 @@ import (
 
 type TaskGiver interface {
 	GetTasksByUserId(userId int) (entity []entities.TaskEntity, err error)
+}
+
+type Request struct {
+	Name string `json:"name"`
+}
+
+type Response struct {
+	status int
+	Id     int64 `json:"id"`
 }
 
 func New(log *slog.Logger, taskGiver TaskGiver) http.HandlerFunc {
