@@ -6,4 +6,5 @@ type TaskEntity struct {
 	CreatedAt   string `json:"date"`
 	IsCompleted bool   `json:"isCompleted"`
 	UserId      int    `json:"UserId"`
+	ListId      int    `json:"ListId"`
 }
