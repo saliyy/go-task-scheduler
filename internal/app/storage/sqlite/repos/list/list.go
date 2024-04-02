@@ -41,10 +41,7 @@ func (r *ListRepository) Сreate(dto *dto.ListCreateDTO) (entity *entities.ListE
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	id, err := res.LastInsertId()
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
-	}
+	id, _ := res.LastInsertId()
 
 	stmt, err = tx.Prepare("INSERT INTO users_lists(UserId, ListId) VALUES (?, ?)")
 

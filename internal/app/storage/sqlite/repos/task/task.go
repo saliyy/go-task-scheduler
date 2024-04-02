@@ -21,14 +21,13 @@ func New(sqliteStorage *sqlite.Storage) *TaskRepository {
 func (r *TaskRepository) SaveTask(taskDTO *dto.CreateTaskDTO) (entity *entities.TaskEntity, err error) {
 	const op = "storage.sqlite.saveTask"
 
-	stmt, err := r.storage.DB.Prepare("INSERT INTO tasks(Name, UserId) VALUES (?, ?)")
+	stmt, err := r.storage.DB.Prepare("INSERT INTO tasks(Name, UserId, ListId) VALUES (?, ?, ?)")
 
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
-
 	}
 
-	res, err := stmt.Exec(taskDTO.Name, taskDTO.UserId)
+	res, err := stmt.Exec(taskDTO.Name, taskDTO.UserId, taskDTO.ListId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -44,6 +43,7 @@ func (r *TaskRepository) SaveTask(taskDTO *dto.CreateTaskDTO) (entity *entities.
 		IsCompleted: false,
 		CreatedAt:   time.DateTime,
 		UserId:      taskDTO.UserId,
+		ListId:      taskDTO.ListId,
 	}, nil
 }
 

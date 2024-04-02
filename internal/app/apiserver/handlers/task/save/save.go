@@ -1,7 +1,6 @@
 package save
 
 import (
-	"fmt"
 	"net/http"
 	"task-scheduler/internal/app/apiserver/middlewares/auth"
 	dto "task-scheduler/internal/app/dto/task"
@@ -15,7 +14,8 @@ import (
 )
 
 type Request struct {
-	Name string `json:"name"`
+	Name   string `json:"name"`
+	ListId int    `json:"listId"`
 }
 
 type Response struct {
@@ -65,9 +65,9 @@ func New(log *slog.Logger, taskSaver TaskSaver) http.HandlerFunc {
 			Name:        req.Name,
 			IsCompleted: false,
 			UserId:      currentUserId,
+			ListId:      req.ListId,
 		}
 
-		fmt.Println(createDto)
 		taskEntity, err := taskSaver.SaveTask(createDto)
 
 		if err != nil {
