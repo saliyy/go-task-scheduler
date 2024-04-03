@@ -93,6 +93,7 @@ func New(log *slog.Logger, userCreator UserCreator) http.HandlerFunc {
 
 		}
 
+		// notify system user was created
 		bell.Ring(events.UserCreated, user)
 
 		log.Info("user created", user)
