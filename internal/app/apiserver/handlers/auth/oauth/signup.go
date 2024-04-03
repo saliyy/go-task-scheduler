@@ -5,11 +5,13 @@ import (
 	"net/http"
 	user_dto "task-scheduler/internal/app/dto/user"
 	"task-scheduler/internal/app/entities"
+	"task-scheduler/internal/app/events"
 	"task-scheduler/internal/app/storage"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
+	"github.com/nuttech/bell/v2"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/slog"
 )
@@ -90,6 +92,8 @@ func New(log *slog.Logger, userCreator UserCreator) http.HandlerFunc {
 			return
 
 		}
+
+		bell.Ring(events.UserCreated, user)
 
 		log.Info("user created", user)
 

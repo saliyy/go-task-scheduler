@@ -64,3 +64,8 @@ func (r *ListRepository) Сreate(dto *dto.ListCreateDTO) (entity *entities.ListE
 		Name: dto.Name,
 	}, nil
 }
+
+func (r *ListRepository) CreateDefaultList(userId int) {
+	dto := dto.ListCreateDTO{Name: "Default List", UserId: userId}
+	r.Сreate(&dto)
+}

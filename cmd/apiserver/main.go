@@ -11,6 +11,8 @@ import (
 	task "task-scheduler/internal/app/apiserver/handlers/task/list"
 	"task-scheduler/internal/app/apiserver/handlers/task/save"
 	"task-scheduler/internal/app/apiserver/middlewares/auth"
+	"task-scheduler/internal/app/events"
+	"task-scheduler/internal/app/listeners"
 	"task-scheduler/internal/app/storage/sqlite"
 	listrepo "task-scheduler/internal/app/storage/sqlite/repos/list"
 	taskrepo "task-scheduler/internal/app/storage/sqlite/repos/task"
@@ -50,6 +52,15 @@ func main() {
 
 	taskRepo := taskrepo.New(storage)
 	listRepo := listrepo.New(storage)
+
+	// todo move to factory
+	userCreatedListener := listeners.NewDefaultListCreator(listRepo)
+
+	listeners := &listeners.Listeners{
+		CreateDefaultListListener: userCreatedListener,
+	}
+
+	events.Init(listeners)
 
 	router.Route("/tasks", func(r chi.Router) {
 		r.Use(auth.CurrentUserCtx)
